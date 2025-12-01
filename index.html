@@ -17,7 +17,6 @@
       height: 300px;
     }
 
-    /* La ruota (solo grafica, con spicchi colorati) */
     .wheel {
       width: 100%;
       height: 100%;
@@ -35,7 +34,6 @@
       );
     }
 
-    /* La freccia fissa in alto (il "puntatore") */
     .pointer {
       position: absolute;
       top: -15px;
@@ -54,10 +52,17 @@
       cursor: pointer;
     }
 
-    #result {
+    #result a {
+      display: inline-block;
       margin-top: 20px;
       font-size: 18px;
       font-weight: bold;
+      color: #2196f3;
+      text-decoration: none;
+    }
+
+    #result a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
@@ -74,14 +79,14 @@
   <div id="result"></div>
 
   <script>
-    // I premi (puoi cambiarli come vuoi)
+    // Premi + link
     const segments = [
-      "Sconto 10%",
-      "Dolce omaggio",
-      "Bibita gratis",
-      "Nessuna vincita 😅",
-      "Antipasto omaggio",
-      "Caffè gratis"
+      { name: "Sconto 10%", url: "https://pnssm.pro/79ru3eq" },
+      { name: "Dolce omaggio", url: "https://pnssm.pro/79ru3eq" },
+      { name: "Bibita gratis", url: "https://pnssm.pro/79ru3eq" },
+      { name: "Nessuna vincita 😅", url: "https://pnssm.pro/79ru3eq" },
+      { name: "Antipasto omaggio", url: "https://pnssm.pro/79ru3eq" },
+      { name: "Caffè gratis", url: "https://pnssm.pro/79ru3eq" }
     ];
 
     const wheel = document.getElementById("wheel");
@@ -92,22 +97,24 @@
     let spinning = false;
 
     button.addEventListener("click", () => {
-      if (spinning) return; // evita click multipli durante la rotazione
+      if (spinning) return;
       spinning = true;
-      resultDiv.textContent = "";
+      resultDiv.innerHTML = "";
 
-      // Rotazione extra (giri completi + angolo casuale)
       const extraRotation = 360 * 5 + Math.floor(Math.random() * 360);
       currentRotation += extraRotation;
       wheel.style.transform = `rotate(${currentRotation}deg)`;
 
-      // Scelta casuale del premio (logica semplice, non legata agli spicchi reali)
       const index = Math.floor(Math.random() * segments.length);
-      const selectedPrize = segments[index];
+      const prize = segments[index];
 
-      // Mostra il risultato dopo la fine dell'animazione (4s)
       setTimeout(() => {
-        resultDiv.textContent = "Risultato: " + selectedPrize;
+        resultDiv.innerHTML = `
+          <a href="${prize.url}" target="_blank">
+            Hai vinto: ${prize.name} 🎉<br>
+            Clicca qui per riscattare
+          </a>
+        `;
         spinning = false;
       }, 4000);
     });
