@@ -9,14 +9,12 @@
       text-align: center;
       margin-top: 40px;
     }
-
     .wheel-container {
       position: relative;
       margin: 0 auto 20px;
       width: 300px;
       height: 300px;
     }
-
     .wheel {
       width: 100%;
       height: 100%;
@@ -33,7 +31,6 @@
         #ff9800 300deg 360deg
       );
     }
-
     .pointer {
       position: absolute;
       top: -15px;
@@ -45,48 +42,46 @@
       border-right: 15px solid transparent;
       border-bottom: 20px solid #333;
     }
-
-    button {
+    button, a.button-link {
       padding: 10px 20px;
       font-size: 16px;
       cursor: pointer;
-    }
-
-    #result a {
+      text-decoration: none;
+      color: white;
+      background-color: #2196f3;
+      border: none;
+      border-radius: 4px;
       display: inline-block;
+      margin-top: 20px;
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: default;
+    }
+    #result {
       margin-top: 20px;
       font-size: 18px;
       font-weight: bold;
-      color: #2196f3;
-      text-decoration: none;
-    }
-
-    #result a:hover {
-      text-decoration: underline;
     }
   </style>
 </head>
 <body>
   <h1>Ruota della Fortuna</h1>
-
   <div class="wheel-container">
     <div class="pointer"></div>
     <div id="wheel" class="wheel"></div>
   </div>
-
   <button id="spinButton">Gira la ruota</button>
-
   <div id="result"></div>
 
   <script>
-    // Premi + link
     const segments = [
-      { name: "Sconto 10%", url: "https://pnssm.pro/79ru3eq" },
+      { name: "10% sconto", url: "https://pnssm.pro/79ru3eq" },
+      { name: "15% sconto", url: "https://pnssm.pro/79ru3eq" },
+      { name: "20% sconto", url: "https://pnssm.pro/79ru3eq" },
+      { name: "2x1 tacos", url: "https://pnssm.pro/79ru3eq" },
       { name: "Dolce omaggio", url: "https://pnssm.pro/79ru3eq" },
-      { name: "Bibita gratis", url: "https://pnssm.pro/79ru3eq" },
-      { name: "Nessuna vincita 😅", url: "https://pnssm.pro/79ru3eq" },
-      { name: "Antipasto omaggio", url: "https://pnssm.pro/79ru3eq" },
-      { name: "Caffè gratis", url: "https://pnssm.pro/79ru3eq" }
+      { name: "Nessuna vincita 🙁", url: "https://tuosito.com/ritenta" }
     ];
 
     const wheel = document.getElementById("wheel");
@@ -101,18 +96,21 @@
       spinning = true;
       resultDiv.innerHTML = "";
 
+      // rotazione: 5 giri completi + angolo casuale
       const extraRotation = 360 * 5 + Math.floor(Math.random() * 360);
       currentRotation += extraRotation;
       wheel.style.transform = `rotate(${currentRotation}deg)`;
 
-      const index = Math.floor(Math.random() * segments.length);
-      const prize = segments[index];
+      // determino l’indice del premio
+      const prizeIndex = Math.floor(Math.random() * segments.length);
+      const prize = segments[prizeIndex];
 
       setTimeout(() => {
+        // mostro bottone per riscattare
         resultDiv.innerHTML = `
-          <a href="${prize.url}" target="_blank">
-            Hai vinto: ${prize.name} 🎉<br>
-            Clicca qui per riscattare
+          Hai vinto: <strong>${prize.name}</strong> 🎉<br>
+          <a class="button-link" href="${prize.url}" target="_blank">
+            Riscatta ora
           </a>
         `;
         spinning = false;
