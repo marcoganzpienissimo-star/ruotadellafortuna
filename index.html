@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Ruota della Fortuna</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    .wheel-container {
+      position: relative;
+      margin: 0 auto 20px;
+      width: 300px;
+      height: 300px;
+    }
+
+    /* La ruota (solo grafica, con spicchi colorati) */
+    .wheel {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 4px solid #333;
+      margin: 0 auto;
+      transition: transform 4s ease-out;
+      background: conic-gradient(
+        #f44336 0deg 60deg,
+        #ffeb3b 60deg 120deg,
+        #4caf50 120deg 180deg,
+        #2196f3 180deg 240deg,
+        #9c27b0 240deg 300deg,
+        #ff9800 300deg 360deg
+      );
+    }
+
+    /* La freccia fissa in alto (il "puntatore") */
+    .pointer {
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-bottom: 20px solid #333;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Ruota della Fortuna</h1>
+
+  <div class="wheel-container">
+    <div class="pointer"></div>
+    <div id="wheel" class="wheel"></div>
+  </div>
+
+  <button id="spinButton">Gira la ruota</button>
+
+  <div id="result"></div>
+
+  <script>
+    // I premi (puoi cambiarli come vuoi)
+    const segments = [
+      "Sconto 10%",
+      "Dolce omaggio",
+      "Bibita gratis",
+      "Nessuna vincita 😅",
+      "Antipasto omaggio",
+      "Caffè gratis"
+    ];
+
+    const wheel = document.getElementById("wheel");
+    const resultDiv = document.getElementById("result");
+    const button = document.getElementById("spinButton");
+
+    let currentRotation = 0;
+    let spinning = false;
+
+    button.addEventListener("click", () => {
+      if (spinning) return; // evita click multipli durante la rotazione
+      spinning = true;
+      resultDiv.textContent = "";
+
+      // Rotazione extra (giri completi + angolo casuale)
+      const extraRotation = 360 * 5 + Math.floor(Math.random() * 360);
+      currentRotation += extraRotation;
+      wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+      // Scelta casuale del premio (logica semplice, non legata agli spicchi reali)
+      const index = Math.floor(Math.random() * segments.length);
+      const selectedPrize = segments[index];
+
+      // Mostra il risultato dopo la fine dell'animazione (4s)
+      setTimeout(() => {
+        resultDiv.textContent = "Risultato: " + selectedPrize;
+        spinning = false;
+      }, 4000);
+    });
+  </script>
+</body>
+</html>
