@@ -1,121 +1,191 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <title>Ruota della Fortuna</title>
-  <style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruota della Fortuna</title>
+
+<style>
     body {
-      font-family: sans-serif;
-      text-align: center;
-      margin-top: 40px;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin: 0;
+        padding: 20px;
+        background: #fafafa;
     }
+
+    h1 {
+        font-size: 1.6rem;
+    }
+
+    /* --- MOBILE FIRST --- */
     .wheel-container {
-      position: relative;
-      margin: 0 auto 20px;
-      width: 300px;
-      height: 300px;
+        width: 90vw;
+        max-width: 400px;
+        height: 90vw;
+        max-height: 400px;
+        margin: 30px auto;
+        position: relative;
     }
-    .wheel {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      border: 4px solid #333;
-      margin: 0 auto;
-      transition: transform 4s ease-out;
-      background: conic-gradient(
-        #f44336 0deg 60deg,
-        #ffeb3b 60deg 120deg,
-        #4caf50 120deg 180deg,
-        #2196f3 180deg 240deg,
-        #9c27b0 240deg 300deg,
-        #ff9800 300deg 360deg
-      );
-    }
+
+    /* PUNTATORE */
     .pointer {
-      position: absolute;
-      top: -15px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 0;
-      height: 0;
-      border-left: 15px solid transparent;
-      border-right: 15px solid transparent;
-      border-bottom: 20px solid #333;
+        position: absolute;
+        top: -25px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 20px solid transparent;
+        border-right: 20px solid transparent;
+        border-bottom: 30px solid #222;
+        z-index: 5;
     }
-    button, a.button-link {
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-      text-decoration: none;
-      color: white;
-      background-color: #2196f3;
-      border: none;
-      border-radius: 4px;
-      display: inline-block;
-      margin-top: 20px;
+
+    /* RUOTA */
+    .wheel {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 5px solid #000;
+        transition: transform 5s cubic-bezier(.17,.67,.14,1);
     }
-    button:disabled {
-      opacity: 0.6;
-      cursor: default;
+
+    /* BOTTONE */
+    .spin-btn {
+        padding: 14px 28px;
+        font-size: 20px;
+        background: #ff5722;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-top: 10px;
+        width: 80%;
+        max-width: 300px;
     }
+
+    .spin-btn:disabled {
+        opacity: 0.5;
+        cursor: default;
+    }
+
+    /* RISULTATO */
     #result {
-      margin-top: 20px;
-      font-size: 18px;
-      font-weight: bold;
+        margin-top: 25px;
+        font-size: 1.2rem;
+        font-weight: bold;
     }
-  </style>
+
+    a.riscatta {
+        display: inline-block;
+        margin-top: 15px;
+        padding: 14px 24px;
+        background: #2196f3;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+    }
+</style>
 </head>
+
 <body>
-  <h1>Ruota della Fortuna</h1>
-  <div class="wheel-container">
+
+<h1>Ruota della Fortuna</h1>
+
+<div class="wheel-container">
     <div class="pointer"></div>
-    <div id="wheel" class="wheel"></div>
-  </div>
-  <button id="spinButton">Gira la ruota</button>
-  <div id="result"></div>
+    <canvas id="wheelCanvas" width="500" height="500"></canvas>
+</div>
 
-  <script>
-    const segments = [
-      { name: "10% sconto", url: "https://pnssm.pro/79ru3eq" },
-      { name: "15% sconto", url: "https://pnssm.pro/79ru3eq" },
-      { name: "20% sconto", url: "https://pnssm.pro/79ru3eq" },
-      { name: "2x1 tacos", url: "https://pnssm.pro/79ru3eq" },
-      { name: "Dolce omaggio", url: "https://pnssm.pro/79ru3eq" },
-      { name: "Nessuna vincita 🙁", url: "https://tuosito.com/ritenta" }
-    ];
+<button class="spin-btn" id="spinButton">Gira la Ruota</button>
 
-    const wheel = document.getElementById("wheel");
-    const resultDiv = document.getElementById("result");
-    const button = document.getElementById("spinButton");
+<div id="result"></div>
 
-    let currentRotation = 0;
-    let spinning = false;
+<script>
+/* ========= CONFIGURAZIONE SPICCHI ========= */
+/* Puoi cambiare colori, testi, aggiungere immagini */
 
-    button.addEventListener("click", () => {
-      if (spinning) return;
-      spinning = true;
-      resultDiv.innerHTML = "";
+const prizes = [
+    { label: "10% Sconto", color: "#f44336", url: "https://tuolink.com/10" },
+    { label: "Dolce Omaggio", color: "#ff9800", url: "https://tuolink.com/dolce" },
+    { label: "Bibita Gratis", color: "#ffeb3b", url: "https://tuolink.com/bibita" },
+    { label: "Nessuna Vincita", color: "#4caf50", url: "https://tuolink.com/ritenta" },
+    { label: "Antipasto", color: "#2196f3", url: "https://tuolink.com/antipasto" },
+    { label: "Caffè Gratis", color: "#9c27b0", url: "https://tuolink.com/caffe" }
+];
 
-      // rotazione: 5 giri completi + angolo casuale
-      const extraRotation = 360 * 5 + Math.floor(Math.random() * 360);
-      currentRotation += extraRotation;
-      wheel.style.transform = `rotate(${currentRotation}deg)`;
+/* ========= DISEGNO RUOTA ========= */
 
-      // determino l’indice del premio
-      const prizeIndex = Math.floor(Math.random() * segments.length);
-      const prize = segments[prizeIndex];
+const canvas = document.getElementById("wheelCanvas");
+const ctx = canvas.getContext("2d");
+const size = canvas.width;
+const radius = size / 2;
 
-      setTimeout(() => {
-        // mostro bottone per riscattare
-        resultDiv.innerHTML = `
-          Hai vinto: <strong>${prize.name}</strong> 🎉<br>
-          <a class="button-link" href="${prize.url}" target="_blank">
-            Riscatta ora
-          </a>
-        `;
-        spinning = false;
-      }, 4000);
+function drawWheel() {
+    const arc = 2 * Math.PI / prizes.length;
+
+    ctx.clearRect(0, 0, size, size);
+
+    prizes.forEach((prize, index) => {
+        const startAngle = index * arc;
+        const endAngle = startAngle + arc;
+
+        ctx.beginPath();
+        ctx.moveTo(radius, radius);
+        ctx.arc(radius, radius, radius, startAngle, endAngle);
+        ctx.fillStyle = prize.color;
+        ctx.fill();
+        ctx.stroke();
+
+        // Testo spicchio
+        ctx.save();
+        ctx.translate(radius, radius);
+        ctx.rotate(startAngle + arc / 2);
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#fff";
+        ctx.font = "bold 22px Arial";
+        ctx.fillText(prize.label, radius - 10, 10);
+        ctx.restore();
     });
-  </script>
+}
+
+drawWheel();
+
+/* ========= LOGICA DI ROTAZIONE ========= */
+
+let rotation = 0;
+let spinning = false;
+
+document.getElementById("spinButton").addEventListener("click", () => {
+    if (spinning) return;
+    spinning = true;
+
+    const extra = Math.floor(Math.random() * 360);
+    const totalRotation = 360 * 8 + extra;
+
+    rotation += totalRotation;
+
+    canvas.style.transition = "transform 5s cubic-bezier(.17,.67,.14,1)";
+    canvas.style.transform = `rotate(${rotation}deg)`;
+
+    setTimeout(() => {
+        const finalDeg = rotation % 360;
+        const arc = 360 / prizes.length;
+        const index = Math.floor((360 - finalDeg) / arc) % prizes.length;
+
+        const prize = prizes[index];
+
+        document.getElementById("result").innerHTML = `
+            Hai vinto: <strong>${prize.label}</strong> 🎉<br>
+            <a class="riscatta" href="${prize.url}" target="_blank">Riscatta ora</a>
+        `;
+
+        spinning = false;
+    }, 5000);
+});
+</script>
+
 </body>
 </html>
